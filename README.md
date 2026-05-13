@@ -21,28 +21,29 @@
 
 ## 🚀 Présentation
 
-**FluxyCore** est un mini-ETL local conçu pour l’analyse de données et l’automatisation avancée. Il tire parti de la simplicité de **Ruby** pour définir des pipelines de traitement (lecture → transformation → export) et de la performance de **Crystal** pour exécuter les opérations coûteuses (filtrage, extraction par regex, parsing de dates, tri, agrégations) de manière native et ultra‑rapide.
+**FluxyCore** est un mini‑ETL local conçu pour l’analyse de données et l’automatisation avancée.  
+Il tire parti de la simplicité de **Ruby** pour définir des pipelines de traitement (lecture → transformation → export) et de la performance de **Crystal** pour exécuter les opérations coûteuses (agrégations, parsing de logs, filtrage) de manière native et ultra‑rapide.
 
-**Cas d’usage typiques :**
-- Analyse de logs systèmes ou applicatifs
-- Transformation de fichiers CSV volumineux
+### Cas d’usage typiques
+- Analyse de logs systèmes ou applicatifs (Apache, NGINX, custom)
+- Transformation de fichiers CSV volumineux (ventes, données IoT)
 - Extraction et mise en forme de données système
-- Automatisation locale de rapports
+- Automatisation de rapports locaux sans dépendance externe
 
 ---
 
 ## 🧱 Architecture
 
-┌─────────────┐ pipeline YAML ┌────────────────────┐
-│ Ruby │──────────────────────▶│ Ruby Pipeline │
-│ (orchestre)│ │ - lit les sources │
+┌─────────────┐ pipeline Ruby ┌────────────────────┐
+│ Ruby │──────────────────────────▶│ Pipeline Ruby │
+│ (orchestre) │ │ - lit les sources │
 └─────────────┘ │ - génère config │
 │ - lance Crystal │
 └─────────┬──────────┘
 │ stdin (JSON lines)
 ▼
 ┌────────────────────┐
-│ Crystal Binary │
+│ Binary Crystal │
 │ (transformateur) │
 │ - streaming │
 │ - batch (sort, │
@@ -55,20 +56,20 @@
 │ - écrit sink │
 └────────────────────┘
 
-
-- **Ruby** parse le fichier YAML de pipeline, lit les données sources (fichiers, stdin), les convertit en flux JSON, exécute le binaire Crystal en lui passant la configuration des transformations, puis récupère le résultat pour l’écrire dans la destination choisie.
-- **Crystal** reçoit les données ligne par ligne sur `stdin`, applique les transformations légères (filtre, map, regex, parsing) en streaming, et exécute les opérations nécessitant l’ensemble du jeu de données (`sort`, `aggregate`) une fois toutes les lignes lues. Le résultat est émis sur `stdout`.
+- **Ruby** : lit les fichiers sources (CSV, JSON, lignes de texte), sérialise les données en flux JSON, appelle le binaire Crystal avec la configuration souhaitée, puis récupère le résultat pour l’écrire dans la destination (CSV, JSON, stdout).
+- **Crystal** : reçoit les données ligne par ligne sur `stdin`, applique les transformations (agrégation, parsing de logs) et renvoie le résultat sur `stdout`, toujours en JSON lignes.
 
 ---
 
 ## 📦 Installation
 
 ### Prérequis
-- **Ruby** ≥ 3.0
-- **Crystal** ≥ 1.9 (https://crystal-lang.org/install/)
+- **Ruby** ≥ 3.0 (avec Bundler)
+- **Crystal** ≥ 1.9 ([installation officielle](https://crystal-lang.org/install/))
 
 ### Cloner et compiler
 ```bash
 git clone https://github.com/votre-compte/FluxyCore.git
 cd FluxyCore
-make build
+make build          # compile le binaire Crystal → bin/fluxy_transformer
+bundle install      # installe les dépendances Ruby
