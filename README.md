@@ -1,7 +1,7 @@
 <!-- README.md -->
 <p align="center">
   <img src="./public/img/ruby-logo-kit/ruby-kit/ruby.png" width="80" alt="Ruby logo"/>
-  <img src="./public/img/Crystal_Language/Crystal_Language.svg" width="80" alt="Crystal logo"/>
+  <img src="./public/img/Crystal_Language/Crystal_Language_logo.png" width="80" alt="Crystal logo"/>
 </p>
 
 <h1 align="center">FluxyCore</h1>
