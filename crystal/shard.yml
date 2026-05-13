@@ -5,3 +5,8 @@ targets:
   fluxy_transformer:
     main: src/fluxy_transformer.cr
     output: ../../bin/fluxy_transformer
+
+dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+    version: ~> 1.6.0

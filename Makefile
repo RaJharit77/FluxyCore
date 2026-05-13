@@ -1,9 +1,44 @@
-.PHONY: build clean
+.PHONY: build test ruby-test crystal-test lint rubocop ameba docker-build ci
 
-build: bin/fluxycore_transformer
+# Variables
+CRYSTAL_DIR = src/crystal
+BINARY = bin/fluxy_transformer
 
-bin/fluxycore_transformer: crystal/src/fluxycore_transformer.cr
-	crystal build crystal/src/fluxycore_transformer.cr -o bin/fluxycore_transformer --release
+# Compilation du binaire Crystal
+build:
+	cd $(CRYSTAL_DIR) && shards build
+	@echo "✅ Crystal binary built at $(BINARY)"
 
-clean:
-	rm -f bin/fluxycore_transformer
+# Tests Ruby
+ruby-test:
+	bundle exec ruby test/test_pipeline.rb
+
+# Tests Crystal (unitaires)
+crystal-test:
+	cd $(CRYSTAL_DIR) && crystal spec --order random
+
+# Tous les tests
+test: ruby-test crystal-test
+	@echo "✅ All tests passed"
+
+# Linting Ruby
+rubocop:
+	bundle exec rubocop
+
+# Linting Crystal
+ameba:
+	cd $(CRYSTAL_DIR) && shards exec ameba
+
+# Linting complet
+lint: rubocop ameba
+
+# Construction de l'image Docker
+docker-build:
+	docker build -t fluxycore:latest .
+
+# Lancement d'un pipeline via Docker
+docker-run:
+	docker run --rm -v $(PWD)/data:/app/data -v $(PWD)/output:/app/output fluxycore examples/csv_aggregation.rb
+
+# CI complète (build + lint + test)
+ci: build lint test

@@ -1,0 +1,44 @@
+name: FluxyCore CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Crystal
+              uses: crystal-lang/install-crystal@v1
+              with:
+                  crystal: 1.14.0
+
+            - name: Setup Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.3"
+                  bundler-cache: true
+
+            - name: Install Crystal dependencies
+              run: cd src/crystal && shards install
+
+            - name: Lint Ruby (RuboCop)
+              run: bundle exec rubocop
+
+            - name: Lint Crystal (Ameba)
+              run: cd src/crystal && shards exec ameba
+
+            - name: Build Crystal binary
+              run: cd src/crystal && shards build
+
+            - name: Run Crystal tests
+              run: cd src/crystal && crystal spec
+
+            - name: Run Ruby tests
+              run: bundle exec ruby test/test_pipeline.rb
