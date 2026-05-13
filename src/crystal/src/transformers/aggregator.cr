@@ -1,3 +1,4 @@
+# src/crystal/src/transformers/aggregator.cr
 require "json"
 require "option_parser"
 
@@ -22,7 +23,7 @@ module Transformers
         exit 1
       end
 
-      # Lire tous les objets JSON (un par ligne) depuis stdin
+      # Lecture de tous les objets JSON (un par ligne) depuis stdin
       rows = STDIN.each_line.map { |line| JSON.parse(line) }.to_a
 
       # Groupement
@@ -37,19 +38,30 @@ module Transformers
         end
 
         if !sum_field.empty?
-          total = group.sum { |r| r[sum_field]?.try(&.as_f? || r[sum_field]?.as_i?.try(&.to_f) || 0.0) || 0.0 }
+          total = group.sum do |r|
+            val = r[sum_field]?
+            next 0.0 unless val
+
+            # Essaie d'obtenir un Float64, puis un Int, sinon 0
+            val.as_f? || val.as_i?.try(&.to_f) || 0.0
+          end
           obj["sum_#{sum_field}"] = JSON::Any.new(total)
         end
 
         if !avg_field.empty?
-          avg = group.size > 0 ? (group.sum { |r| r[avg_field]?.try(&.as_f? || r[avg_field]?.as_i?.try(&.to_f) || 0.0) || 0.0 } / group.size) : 0.0
+          sum_values = group.sum do |r|
+            val = r[avg_field]?
+            next 0.0 unless val
+            val.as_f? || val.as_i?.try(&.to_f) || 0.0
+          end
+          avg = group.size > 0 ? (sum_values / group.size) : 0.0
           obj["avg_#{avg_field}"] = JSON::Any.new(avg)
         end
 
         obj
       end
 
-      # Sortie JSON une ligne par groupe
+      # Sortie : un JSON par ligne
       results.each { |r| puts r.to_json }
     end
   end
