@@ -1,0 +1,27 @@
+pipeline:
+  name: Analyse de logs
+  source:
+    type: file
+    path: "./examples/sample.log"
+    format: lines
+  transforms:
+    - type: filter
+      field: raw           # on filtre sur le champ 'raw' (créé par Ruby)
+      pattern: "ERROR"
+    - type: regex_extract
+      pattern: "^(\\S+ \\S+ \\S+) \\[(\\S+)\\] (.*)$"
+      fields: [timestamp, level, message]
+    - type: map
+      set:
+        field: severity
+        value: "high"
+    - type: timestamp_parse
+      field: timestamp
+      format: "%Y-%m-%d %H:%M:%S"
+    - type: sort
+      field: timestamp
+      direction: asc
+  sink:
+    type: file
+    path: "./output/errors.json"
+    format: json
