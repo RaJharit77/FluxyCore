@@ -67,3 +67,8 @@ yarn-debug.log*
 /storage/*
 !/storage/.keep
 /public/uploads
+
+bin/fluxycore_transformer
+*.dwarf
+tmp/
+output/
