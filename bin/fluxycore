@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
+require 'fluxycore'
+
+if ARGV.empty?
+  puts "Usage: fluxycore <pipeline_script>"
+  exit 1
+end
+
+script = ARGV[0]
+load script

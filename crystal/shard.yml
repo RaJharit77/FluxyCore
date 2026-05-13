@@ -1,0 +1,7 @@
+name: fluxy_core
+version: 0.1.0
+
+targets:
+  fluxy_transformer:
+    main: src/fluxy_transformer.cr
+    output: ../../bin/fluxy_transformer
