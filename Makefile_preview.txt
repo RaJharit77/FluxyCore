@@ -1,0 +1,38 @@
+.PHONY: build test ruby-test crystal-test lint rubocop ameba docker-build ci
+
+CRYSTAL_DIR = src/crystal
+BINARY = bin/fluxy_transformer
+
+build:
+	cd $(CRYSTAL_DIR) && shards build
+	@echo "✅ Crystal binary built at $(BINARY)"
+
+ruby-test:
+	bundle exec ruby -Ilib test/test_pipeline.rb
+	@echo "✅ Ruby tests passed"
+
+crystal-test:
+	cd $(CRYSTAL_DIR) && crystal spec --order random
+	@echo "✅ Crystal tests passed"
+
+test: ruby-test crystal-test
+	@echo "✅ All tests passed"
+
+run-example: build
+	bundle exec bin/fluxycore examples/csv_aggregation.rb
+
+rubocop:
+	bundle exec rubocop
+
+ameba:
+	cd $(CRYSTAL_DIR) && shards exec ameba
+
+lint: rubocop ameba
+
+docker-build:
+	docker build -t fluxycore:latest .
+
+docker-run:
+	docker run --rm -v $(PWD)/data:/app/data -v $(PWD)/output:/app/output fluxycore examples/csv_aggregation.rb
+
+ci: build lint test
