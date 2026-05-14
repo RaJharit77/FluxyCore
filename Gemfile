@@ -6,4 +6,5 @@ gem 'rake'
 
 group :development, :test do
   gem 'rubocop', require: false
+  gem 'minitest'
 end

@@ -72,3 +72,5 @@ bin/fluxycore_transformer
 *.dwarf
 tmp/
 output/
+
+makefile
