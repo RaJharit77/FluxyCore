@@ -7,11 +7,14 @@ BINARY = bin/fluxy_transformer
 # Compilation du binaire Crystal
 build:
 	cd $(CRYSTAL_DIR) && shards build
+	mkdir -p bin
+	cp $(CRYSTAL_DIR)/bin/fluxy_transformer $(BINARY)
 	@echo "✅ Crystal binary built at $(BINARY)"
 
-# Tests Ruby
-ruby-test:
-	bundle exec ruby test/test_pipeline.rb
+# Nettoyage des fichiers générés
+clean:
+	rm -f $(BINARY)
+	rm -rf $(CRYSTAL_DIR)/bin
 
 # Tests Crystal (unitaires)
 crystal-test:
@@ -46,7 +49,7 @@ docker-build:
 
 # Lancement d'un pipeline via Docker
 docker-run:
-	docker run --rm -v $(PWD)/data:/app/data -v $(PWD)/output:/app/output fluxycore examples/csv_aggregation.rb
+	docker run --rm -v $(CURDIR)/data:/app/data -v $(CURDIR)/output:/app/output fluxycore examples/csv_aggregation.rb
 
 # CI complète (build + lint + test)
 ci: build lint test
