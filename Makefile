@@ -26,11 +26,11 @@ test: ruby-test crystal-test
 
 ruby-test:
 	bundle exec ruby -Ilib test/test_pipeline.rb
-	$@echo "✅ Ruby tests passed"
+	@echo "✅ Ruby tests passed"
 
 run-example: build
 	bundle exec bin/fluxycore examples/csv_aggregation.rb
-	$@echo "✅ Example script executed successfully"
+	@echo "✅ Example script executed successfully"
 
 # Linting Ruby
 rubocop:

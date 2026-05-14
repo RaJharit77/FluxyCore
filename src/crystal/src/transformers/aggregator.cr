@@ -1,4 +1,3 @@
-# src/crystal/src/transformers/aggregator.cr
 require "json"
 require "option_parser"
 
@@ -41,9 +40,16 @@ module Transformers
           total = group.sum do |r|
             val = r[sum_field]?
             next 0.0 unless val
-
-            # Essaie d'obtenir un Float64, puis un Int, sinon 0
-            val.as_f? || val.as_i?.try(&.to_f) || 0.0
+            case val
+            when String
+              val.to_f? || 0.0
+            when Int
+              val.to_f
+            when Float
+              val
+            else
+              0.0
+            end
           end
           obj["sum_#{sum_field}"] = JSON::Any.new(total)
         end
